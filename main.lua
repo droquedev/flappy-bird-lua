@@ -30,6 +30,8 @@ local spawnTimer = 0
 
 local lastY = -PIPE_HEIGHT + math.random(80) + 20
 
+local scrolling = true
+
 function love.load()
   love.graphics.setDefaultFilter('nearest', 'nearest')
   love.window.setTitle("David's Flappy Bird")
@@ -46,6 +48,10 @@ function love.load()
 end
 
 function love.update(dt)
+  if scrolling == false then
+    return
+  end
+
   backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
   groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
 
@@ -70,6 +76,12 @@ function love.update(dt)
 
   for k, pair in pairs(pipePairs) do
     pair:update(dt)
+
+    for l, pipe in pairs(pair.pipes) do
+      if bird:collides(pipe) then
+        scrolling = false
+      end
+    end
   end
 
   for k, pair in pairs(pipePairs) do
