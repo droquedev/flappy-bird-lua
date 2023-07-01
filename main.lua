@@ -12,6 +12,13 @@ require 'Bird'
 require 'Pipe'
 require 'PipePair'
 
+require 'StateMachine'
+require 'states/BaseState'
+require 'states/PlayState'
+require 'states/ScoreState'
+require 'states/TitleScreenState'
+require 'states/CountDownState'
+
 local background = love.graphics.newImage('assets/imgs/background.png')
 local backgroundScroll = 0
 
@@ -30,11 +37,20 @@ local spawnTimer = 0
 
 local lastY = -PIPE_HEIGHT + math.random(80) + 20
 
-local scrolling = true
+SCROLLING = true
+
+G_StateMachine = nil
+
+local smallFont = love.graphics.newFont('assets/fonts/font.ttf', 8)
+MEDIUM_FONT = love.graphics.newFont('assets/fonts/flappy.ttf', 14)
+FLAPPY_FONT = love.graphics.newFont('assets/fonts/flappy.ttf', 28)
+HUGE_FONT = love.graphics.newFont('assets/fonts/flappy.ttf', 56)
 
 function love.load()
   love.graphics.setDefaultFilter('nearest', 'nearest')
   love.window.setTitle("David's Flappy Bird")
+
+  love.graphics.setFont(FLAPPY_FONT)
 
   math.randomseed(os.time())
 
@@ -44,51 +60,22 @@ function love.load()
     vsync = true
   })
 
+  G_StateMachine = StateMachine {
+    ['title'] = function() return TitleScreenState() end,
+    ['play'] = function() return PlayState() end,
+    ['score'] = function() return ScoreState() end,
+    ['countdown'] = function() return CountDownState() end
+  }
+  G_StateMachine:change('title')
+
   love.keyboard.keysPressed = {}
 end
 
 function love.update(dt)
-  if scrolling == false then
-    return
-  end
-
   backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
   groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
 
-  spawnTimer = spawnTimer + dt
-
-  if spawnTimer > 3 then
-    local y = math.max(
-      -PIPE_HEIGHT + 10,
-      math.min(
-        lastY + math.random(-20, 20),
-        VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT
-      )
-    )
-
-    lastY = y
-
-    table.insert(pipePairs, PipePair(y))
-    spawnTimer = 0
-  end
-
-  bird:update(dt)
-
-  for k, pair in pairs(pipePairs) do
-    pair:update(dt)
-
-    for l, pipe in pairs(pair.pipes) do
-      if bird:collides(pipe) then
-        scrolling = false
-      end
-    end
-  end
-
-  for k, pair in pairs(pipePairs) do
-    if pair.remove then
-      table.remove(pipePairs, k)
-    end
-  end
+  G_StateMachine:update(dt)
 
   love.keyboard.keysPressed = {}
 end
@@ -112,14 +99,8 @@ function love.draw()
   push:start()
 
   love.graphics.draw(background, -backgroundScroll, 0)
-
-  for k, pair in pairs(pipePairs) do
-    pair:render()
-  end
-
+  G_StateMachine:render()
   love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
-
-  bird:render()
 
   push:finish()
 end
