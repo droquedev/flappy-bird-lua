@@ -8,6 +8,15 @@ WINDOW_HEIGHT = 720
 VIRTUAL_WIDTH = 512
 VIRTUAL_HEIGHT = 288
 
+SOUNDS = {
+  ['jump'] = love.audio.newSource('assets/sfx/jump.wav', 'static'),
+  ['explosion'] = love.audio.newSource('assets/sfx/explosion.wav', 'static'),
+  ['hurt'] = love.audio.newSource('assets/sfx/hurt.wav', 'static'),
+  ['score'] = love.audio.newSource('assets/sfx/score.wav', 'static'),
+
+  ['music'] = love.audio.newSource('assets/music/marios_way.mp3', 'static')
+}
+
 require 'Bird'
 require 'Pipe'
 require 'PipePair'
@@ -51,6 +60,9 @@ function love.load()
   love.window.setTitle("David's Flappy Bird")
 
   love.graphics.setFont(FLAPPY_FONT)
+
+  SOUNDS['music']:setLooping(true)
+  SOUNDS['music']:play()
 
   math.randomseed(os.time())
 
