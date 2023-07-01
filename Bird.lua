@@ -1,5 +1,7 @@
 Bird = Class {}
 
+local GRAVITY = 17.5
+
 function Bird:init()
   self.sprite = love.graphics.newImage('assets/imgs/bird.png')
   self.width = self.sprite:getWidth()
@@ -7,8 +9,19 @@ function Bird:init()
 
   self.x = VIRTUAL_WIDTH / 2 - (self.width / 2)
   self.y = VIRTUAL_HEIGHT / 2 - (self.height / 2)
+
+  self.dy = 0
 end
 
 function Bird:render()
   love.graphics.draw(self.sprite, self.x, self.y)
+end
+
+function Bird:update(dt)
+  self.dy = self.dy + GRAVITY * dt
+
+  self.y = self.y + self.dy
+  -- if love.keyboard.wasPressed('space') then
+  --   self.y = self.y - 5
+  -- end
 end
