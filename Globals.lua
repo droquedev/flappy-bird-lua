@@ -11,7 +11,7 @@ require 'states/ScoreState'
 require 'states/TitleScreenState'
 require 'states/CountDownState'
 
-GROUND_SCROLL_SPEED = 60
+GROUND_SCROLL_SPEED = 80
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
@@ -37,7 +37,7 @@ HUGE_FONT = love.graphics.newFont('assets/fonts/flappy.ttf', 56)
 MAX_SCORE = 0
 SAVE_FILE = nil
 
-PIPE_SPEED = 60
+PIPE_SPEED = 100
 PIPE_WIDTH = 70
 PIPE_HEIGHT = 288
 
