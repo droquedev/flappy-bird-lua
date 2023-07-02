@@ -1,32 +1,5 @@
-Class = require 'class'
+require 'Globals'
 local push = require 'push'
-
-GROUND_SCROLL_SPEED = 60
-WINDOW_WIDTH = 1280
-WINDOW_HEIGHT = 720
-
-VIRTUAL_WIDTH = 512
-VIRTUAL_HEIGHT = 288
-
-SOUNDS = {
-  ['jump'] = love.audio.newSource('assets/sfx/jump.wav', 'static'),
-  ['explosion'] = love.audio.newSource('assets/sfx/explosion.wav', 'static'),
-  ['hurt'] = love.audio.newSource('assets/sfx/hurt.wav', 'static'),
-  ['score'] = love.audio.newSource('assets/sfx/score.wav', 'static'),
-
-  ['music'] = love.audio.newSource('assets/music/marios_way.mp3', 'static')
-}
-
-require 'Bird'
-require 'Pipe'
-require 'PipePair'
-
-require 'StateMachine'
-require 'states/BaseState'
-require 'states/PlayState'
-require 'states/ScoreState'
-require 'states/TitleScreenState'
-require 'states/CountDownState'
 
 local background = love.graphics.newImage('assets/imgs/background.png')
 local backgroundScroll = 0
@@ -36,32 +9,28 @@ local groundScroll = 0
 
 local BACKGROUND_SCROLL_SPEED = 30
 local BACKGROUND_LOOPING_POINT = 413
-local GROUND_LOOPING_POINT = 514
 
-local bird = Bird()
-
-local pipePairs = {}
-
-local spawnTimer = 0
-
-local lastY = -PIPE_HEIGHT + math.random(80) + 20
-
-SCROLLING = true
-
-G_StateMachine = nil
-
-local smallFont = love.graphics.newFont('assets/fonts/font.ttf', 8)
-MEDIUM_FONT = love.graphics.newFont('assets/fonts/flappy.ttf', 14)
-FLAPPY_FONT = love.graphics.newFont('assets/fonts/flappy.ttf', 28)
-HUGE_FONT = love.graphics.newFont('assets/fonts/flappy.ttf', 56)
 
 function love.load()
   love.graphics.setDefaultFilter('nearest', 'nearest')
   love.window.setTitle("David's Flappy Bird")
 
+  local fileName = 'score.txt'
+
+  local exists = love.filesystem.getInfo(fileName)
+  if not exists then
+    local saveFile = love.filesystem.newFile(fileName)
+    saveFile:open('w')
+    saveFile:write(tostring(0))
+    saveFile:close()
+  else
+    GetMaxScore()
+  end
+
   love.graphics.setFont(FLAPPY_FONT)
 
   SOUNDS['music']:setLooping(true)
+  SOUNDS['music']:setVolume(0.1)
   SOUNDS['music']:play()
 
   math.randomseed(os.time())
@@ -72,13 +41,13 @@ function love.load()
     vsync = true
   })
 
-  G_StateMachine = StateMachine {
+  STATE_MACHINE = StateMachine {
     ['title'] = function() return TitleScreenState() end,
     ['play'] = function() return PlayState() end,
     ['score'] = function() return ScoreState() end,
     ['countdown'] = function() return CountDownState() end
   }
-  G_StateMachine:change('title')
+  STATE_MACHINE:change('title')
 
   love.keyboard.keysPressed = {}
 end
@@ -87,7 +56,7 @@ function love.update(dt)
   backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
   groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
 
-  G_StateMachine:update(dt)
+  STATE_MACHINE:update(dt)
 
   love.keyboard.keysPressed = {}
 end
@@ -111,7 +80,7 @@ function love.draw()
   push:start()
 
   love.graphics.draw(background, -backgroundScroll, 0)
-  G_StateMachine:render()
+  STATE_MACHINE:render()
   love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
 
   push:finish()

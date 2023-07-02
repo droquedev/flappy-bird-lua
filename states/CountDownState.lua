@@ -15,7 +15,7 @@ function CountDownState:update(dt)
     self.count = self.count - 1
 
     if self.count == 0 then
-      G_StateMachine:change('play')
+      STATE_MACHINE:change('play')
     end
   end
 end
