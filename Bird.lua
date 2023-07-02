@@ -1,6 +1,6 @@
 Bird = Class {}
 
-local GRAVITY = 20
+local GRAVITY = 0
 
 function Bird:init()
   self.sprite = love.graphics.newImage('assets/imgs/bird.png')
@@ -23,8 +23,13 @@ function Bird:update(dt)
   local wasSpacePressed = love.keyboard.wasPressed('space')
   local isOutScreen = self.y <= 0 + self.height
   if wasSpacePressed and isOutScreen == false then
-    self.dy = -4
+    GRAVITY = 0
+    self.dy = -3
     SOUNDS['jump']:play()
+  end
+
+  if (GRAVITY < 25) then
+    GRAVITY = GRAVITY + 1
   end
 
   self.y = self.y + self.dy
