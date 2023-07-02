@@ -2,7 +2,10 @@ ScoreState = Class { __includes = BaseState }
 
 function ScoreState:enter(params)
   self.score = params.score
-  SaveScore(self.score)
+  if self.score > MAX_SCORE then
+    MAX_SCORE = self.score
+    SaveScore(self.score)
+  end
 end
 
 function ScoreState:update()

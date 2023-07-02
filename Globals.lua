@@ -37,13 +37,15 @@ HUGE_FONT = love.graphics.newFont('assets/fonts/flappy.ttf', 56)
 MAX_SCORE = 0
 SAVE_FILE = nil
 
+PIPE_SPEED = 60
+PIPE_WIDTH = 70
+PIPE_HEIGHT = 288
+
+BIRD_WIDTH = 38
+BIRD_HEIGHT = 24
+
 function SaveScore(score)
-  if score > MAX_SCORE then
-    local saveFile = love.filesystem.newFile('score.txt')
-    saveFile:open('w')
-    saveFile:write(tostring(score))
-    saveFile:close()
-  end
+  love.filesystem.write('score.txt', tostring(score))
 end
 
 function GetMaxScore()

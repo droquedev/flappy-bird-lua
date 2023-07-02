@@ -19,8 +19,11 @@ end
 
 function Bird:update(dt)
   self.dy = self.dy + GRAVITY * dt
-  if love.keyboard.wasPressed('space') then
-    self.dy = -5
+
+  local wasSpacePressed = love.keyboard.wasPressed('space')
+  local isOutScreen = self.y <= 0 + self.height
+  if wasSpacePressed and isOutScreen == false then
+    self.dy = -4
     SOUNDS['jump']:play()
   end
 
