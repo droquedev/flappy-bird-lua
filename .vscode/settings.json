@@ -3,5 +3,9 @@
     "love",
     "class_commons",
     "common"
+  ],
+  "Lua.runtime.version": "LuaJIT",
+  "Lua.workspace.library": [
+    "${3rd}/love2d/library"
   ]
 }

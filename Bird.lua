@@ -2,7 +2,6 @@ Bird = Class {}
 
 local GRAVITY = 0
 local ROTATION = 0
-local TIME_TO_ROTATE = 0.1
 
 function Bird:init()
   self.sprite = love.graphics.newImage('assets/imgs/bird.png')
@@ -17,7 +16,8 @@ end
 
 function Bird:render()
   love.graphics.draw(self.sprite, self.x, self.y, ROTATION)
-  love.graphics.rectangle('line', self.x + 2, self.y + 2, self.width - 4, self.height - 4)
+  -- collider box
+  -- love.graphics.rectangle('line', self.x + 2, self.y + 2, self.width - 4, self.height - 4)
 end
 
 function Bird:update(dt)
@@ -29,15 +29,15 @@ function Bird:update(dt)
   local isOutScreen = self.y <= 0 + self.height
   if wasSpacePressed and isOutScreen == false then
     GRAVITY = 0
-    self.dy = -3
+    self.dy = -2
     SOUNDS['jump']:play()
-    ROTATION = -0.5
+    ROTATION = -0.3
     self.timer = 0
   else
-    if GRAVITY < 20 then
+    if GRAVITY < 20 and self.timer >= 0.15 then
       GRAVITY = GRAVITY + 1
     end
-    if ROTATION < 0.5 and self.timer >= TIME_TO_ROTATE then
+    if ROTATION < 0.3 and self.timer >= 0.3 then
       ROTATION = ROTATION + 0.02
     end
   end
